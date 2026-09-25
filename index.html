@@ -1,208 +1,284 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculadora iOS 2026</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calculadora Científica - iOS Style</title>
+    <style>
+        /* Paleta de Cores do iOS */
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --btn-num: #333333;
+            --btn-num-active: #737373;
+            --btn-op: #ff9f0a;
+            --btn-op-active: #fcc78b;
+            --btn-func: #a5a5a5;
+            --btn-func-active: #d9d9d9;
+            --btn-sci: #212121;
+            --btn-sci-active: #5c5c5c;
+        }
 
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
-}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-body{
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:#000;
-}
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-.calculator{
-    width:380px;
-    max-width:95vw;
-    padding:20px;
-    border-radius:40px;
-    background:#000;
-}
+        .calculator {
+            width: 100%;
+            max-width: 850px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            height: 100%;
+        }
 
-.display{
-    color:white;
-    text-align:right;
-    padding:30px 10px;
-    font-size:4rem;
-    font-weight:300;
-    overflow:hidden;
-    white-space:nowrap;
-}
+        .display {
+            font-size: 5rem;
+            font-weight: 300;
+            text-align: right;
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
 
-.buttons{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:12px;
-}
+        /* Ocultar barra de rolagem no display */
+        .display::-webkit-scrollbar { display: none; }
+        .display { -ms-overflow-style: none; scrollbar-width: none; }
 
-button{
-    border:none;
-    border-radius:50%;
-    height:78px;
-    width:78px;
-    font-size:2rem;
-    cursor:pointer;
-    transition:.15s;
-}
+        .keypad {
+            display: grid;
+            gap: 10px;
+            /* Layout padrão para mobile (Calculadora Básica) */
+            grid-template-columns: repeat(4, 1fr);
+        }
 
-button:active{
-    transform:scale(.95);
-}
+        button {
+            border: none;
+            border-radius: 50%;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-color);
+            aspect-ratio: 1/1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
 
-.gray{
-    background:#a5a5a5;
-    color:#000;
-}
+        /* Cores dos botões */
+        .num { background-color: var(--btn-num); }
+        .num:active { background-color: var(--btn-num-active); }
+        
+        .op { background-color: var(--btn-op); color: white; font-size: 2.2rem; }
+        .op:active { background-color: var(--btn-op-active); }
+        
+        .func { background-color: var(--btn-func); color: black; }
+        .func:active { background-color: var(--btn-func-active); }
 
-.dark{
-    background:#333333;
-    color:#fff;
-}
+        .sci { background-color: var(--btn-sci); font-size: 1.2rem; display: none; }
+        .sci:active { background-color: var(--btn-sci-active); }
 
-.orange{
-    background:#ff9f0a;
-    color:#fff;
-}
+        /* Botão 0 mais largo */
+        .zero {
+            grid-column: span 2;
+            border-radius: 50px;
+            aspect-ratio: auto;
+            justify-content: flex-start;
+            padding-left: 30px;
+        }
 
-.zero{
-    grid-column:span 2;
-    width:100%;
-    border-radius:50px;
-    text-align:left;
-    padding-left:30px;
-}
-
-@media(max-width:420px){
-    button{
-        width:100%;
-        height:70px;
-    }
-
-    .display{
-        font-size:3rem;
-    }
-}
-</style>
+        /* Responsividade: Tela em Paisagem ou Desktop vira Científica (10 colunas) */
+        @media (min-width: 650px) and (orientation: landscape), (min-width: 800px) {
+            .keypad {
+                grid-template-columns: repeat(10, 1fr);
+                gap: 8px;
+            }
+            .sci { display: flex; }
+            button { font-size: 1.3rem; }
+            .op { font-size: 1.6rem; }
+            .zero { padding-left: 20px; }
+            .display { font-size: 4rem; }
+            
+            /* Resetando a ordem da grade para o layout de 10 colunas */
+            .basic { order: 0 !important; }
+        }
+    </style>
 </head>
 <body>
 
-<div class="calculator">
+    <div class="calculator">
+        <div id="display" class="display">0</div>
+        
+        <div class="keypad">
+            <!-- Linha 1 (Modo Paisagem) -->
+            <button class="sci" onclick="input('(', '(')">(</button>
+            <button class="sci" onclick="input(')', ')')">)</button>
+            <button class="sci" onclick="clearMemory()">mc</button>
+            <button class="sci" onclick="addMemory()">m+</button>
+            <button class="sci" onclick="subMemory()">m-</button>
+            <button class="sci" onclick="recallMemory()">mr</button>
+            <button class="basic func" onclick="clearDisplay()" style="order: 1;">AC</button>
+            <button class="basic func" onclick="toggleSign()" style="order: 2;">+/-</button>
+            <button class="basic func" onclick="percentage()" style="order: 3;">%</button>
+            <button class="basic op" onclick="input('÷', '/')" style="order: 4;">÷</button>
 
-    <div class="display" id="display">0</div>
+            <!-- Linha 2 -->
+            <button class="sci">2nd</button>
+            <button class="sci" onclick="input('²', '**2')">x²</button>
+            <button class="sci" onclick="input('³', '**3')">x³</button>
+            <button class="sci" onclick="input('^', '**')">xʸ</button>
+            <button class="sci" onclick="input('e^', 'Math.E**')">eˣ</button>
+            <button class="sci" onclick="input('10^', '10**')">10ˣ</button>
+            <button class="basic num" onclick="input('7', '7')" style="order: 5;">7</button>
+            <button class="basic num" onclick="input('8', '8')" style="order: 6;">8</button>
+            <button class="basic num" onclick="input('9', '9')" style="order: 7;">9</button>
+            <button class="basic op" onclick="input('×', '*')" style="order: 8;">×</button>
 
-    <div class="buttons">
+            <!-- Linha 3 -->
+            <button class="sci" onclick="input('1/', '1/')">1/x</button>
+            <button class="sci" onclick="input('√(', 'Math.sqrt(')">²√x</button>
+            <button class="sci" onclick="input('∛(', 'Math.cbrt(')">³√x</button>
+            <button class="sci" onclick="input('^(1/', '**(1/')">ʸ√x</button>
+            <button class="sci" onclick="input('ln(', 'Math.log(')">ln</button>
+            <button class="sci" onclick="input('log(', 'Math.log10(')">log₁₀</button>
+            <button class="basic num" onclick="input('4', '4')" style="order: 9;">4</button>
+            <button class="basic num" onclick="input('5', '5')" style="order: 10;">5</button>
+            <button class="basic num" onclick="input('6', '6')" style="order: 11;">6</button>
+            <button class="basic op" onclick="input('-', '-')" style="order: 12;">-</button>
 
-        <button class="gray" onclick="clearDisplay()">AC</button>
-        <button class="gray" onclick="toggleSign()">±</button>
-        <button class="gray" onclick="percent()">%</button>
-        <button class="orange" onclick="append('/')">÷</button>
+            <!-- Linha 4 -->
+            <button class="sci" onclick="input('!', '!')">x!</button>
+            <button class="sci" onclick="input('sin(', 'Math.sin(')">sin</button>
+            <button class="sci" onclick="input('cos(', 'Math.cos(')">cos</button>
+            <button class="sci" onclick="input('tan(', 'Math.tan(')">tan</button>
+            <button class="sci" onclick="input('e', 'Math.E')">e</button>
+            <button class="sci" onclick="input('E', '*10**')">EE</button>
+            <button class="basic num" onclick="input('1', '1')" style="order: 13;">1</button>
+            <button class="basic num" onclick="input('2', '2')" style="order: 14;">2</button>
+            <button class="basic num" onclick="input('3', '3')" style="order: 15;">3</button>
+            <button class="basic op" onclick="input('+', '+')" style="order: 16;">+</button>
 
-        <button class="dark" onclick="append('7')">7</button>
-        <button class="dark" onclick="append('8')">8</button>
-        <button class="dark" onclick="append('9')">9</button>
-        <button class="orange" onclick="append('*')">×</button>
-
-        <button class="dark" onclick="append('4')">4</button>
-        <button class="dark" onclick="append('5')">5</button>
-        <button class="dark" onclick="append('6')">6</button>
-        <button class="orange" onclick="append('-')">−</button>
-
-        <button class="dark" onclick="append('1')">1</button>
-        <button class="dark" onclick="append('2')">2</button>
-        <button class="dark" onclick="append('3')">3</button>
-        <button class="orange" onclick="append('+')">+</button>
-
-        <button class="dark zero" onclick="append('0')">0</button>
-        <button class="dark" onclick="append('.')">.</button>
-        <button class="orange" onclick="calculate()">=</button>
-
+            <!-- Linha 5 -->
+            <button class="sci">Rad</button>
+            <button class="sci" onclick="input('sinh(', 'Math.sinh(')">sinh</button>
+            <button class="sci" onclick="input('cosh(', 'Math.cosh(')">cosh</button>
+            <button class="sci" onclick="input('tanh(', 'Math.tanh(')">tanh</button>
+            <button class="sci" onclick="input('π', 'Math.PI')">π</button>
+            <button class="sci" onclick="input('Rand', 'Math.random()')">Rand</button>
+            <button class="basic num zero" onclick="input('0', '0')" style="order: 17;">0</button>
+            <button class="basic num" onclick="input('.', '.')" style="order: 18;">.</button>
+            <button class="basic op" onclick="calculate()" style="order: 19;">=</button>
+        </div>
     </div>
 
-</div>
+    <script>
+        const display = document.getElementById('display');
+        let expression = ''; // O que o Javascript vai calcular
+        let screenText = ''; // O que aparece na tela do usuário
+        let memory = 0; // Armazenamento de memória (m+, m-, mr, mc)
 
-<script>
-let current = '';
+        function updateDisplay() {
+            display.innerText = screenText === '' ? '0' : screenText;
+            display.scrollLeft = display.scrollWidth;
+        }
 
-const display = document.getElementById('display');
+        function input(textChar, evalChar) {
+            if (screenText === 'Erro') clearDisplay();
+            
+            screenText += textChar;
+            expression += evalChar;
+            updateDisplay();
+        }
 
-function updateDisplay(){
-    display.textContent = current || '0';
-}
+        function clearDisplay() {
+            screenText = '';
+            expression = '';
+            updateDisplay();
+        }
 
-function append(value){
-    current += value;
-    updateDisplay();
-}
+        function toggleSign() {
+            if (screenText === '' || screenText === '0') return;
+            if (screenText.startsWith('-')) {
+                screenText = screenText.substring(1);
+                expression = expression.substring(1);
+            } else {
+                screenText = '-' + screenText;
+                expression = '-' + expression;
+            }
+            updateDisplay();
+        }
 
-function clearDisplay(){
-    current = '';
-    updateDisplay();
-}
+        function percentage() {
+            try {
+                let result = eval(expression) / 100;
+                screenText = result.toString();
+                expression = result.toString();
+                updateDisplay();
+            } catch (e) {
+                showError();
+            }
+        }
 
-function toggleSign(){
-    if(!current) return;
+        function calculate() {
+            try {
+                // Lidando com a lógica do Fatorial (x!) antes do Eval
+                let parsedExpr = expression.replace(/(\d+)!/g, (match, num) => {
+                    let n = parseInt(num);
+                    if (n === 0 || n === 1) return 1;
+                    let f = 1;
+                    for (let i = 2; i <= n; i++) f *= i;
+                    return f;
+                });
 
-    if(current.startsWith('-')){
-        current = current.substring(1);
-    }else{
-        current = '-' + current;
-    }
+                let result = eval(parsedExpr);
+                
+                // Lidando com números muito longos ou dízimas
+                if (!Number.isInteger(result)) {
+                    result = parseFloat(result.toFixed(8));
+                }
+                
+                screenText = result.toString();
+                expression = result.toString();
+                updateDisplay();
+            } catch (e) {
+                showError();
+            }
+        }
 
-    updateDisplay();
-}
+        function showError() {
+            screenText = 'Erro';
+            expression = '';
+            updateDisplay();
+            setTimeout(clearDisplay, 1500);
+        }
 
-function percent(){
-    if(!current) return;
-
-    try{
-        current = String(eval(current) / 100);
-        updateDisplay();
-    }catch{
-        display.textContent = 'Erro';
-    }
-}
-
-function calculate(){
-    try{
-        current = String(eval(current));
-        updateDisplay();
-    }catch{
-        display.textContent = 'Erro';
-        current = '';
-    }
-}
-
-document.addEventListener('keydown',(e)=>{
-    const allowed = '0123456789+-*/.';
-    
-    if(allowed.includes(e.key)){
-        append(e.key);
-    }
-
-    if(e.key === 'Enter'){
-        calculate();
-    }
-
-    if(e.key === 'Backspace'){
-        current = current.slice(0,-1);
-        updateDisplay();
-    }
-
-    if(e.key === 'Escape'){
-        clearDisplay();
-    }
-});
-</script>
-
+        // Funções de Memória Científica
+        function clearMemory() { memory = 0; }
+        function addMemory() { 
+            try { memory += eval(expression) || 0; } catch(e){} 
+        }
+        function subMemory() { 
+            try { memory -= eval(expression) || 0; } catch(e){} 
+        }
+        function recallMemory() { input(memory.toString(), memory.toString()); }
+        
+    </script>
 </body>
 </html>
