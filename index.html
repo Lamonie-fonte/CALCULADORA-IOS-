@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora iOS 18</title>
+<style>
+body{background:#000;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;font-family:sans-serif}
+.calc{width:320px}
+#display{color:#fff;font-size:70px;text-align:right;padding:20px;font-weight:200}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+button{height:70px;border-radius:50%;border:none;font-size:28px;color:#fff;background:#333}
+.gray{background:#a5a5a5;color:#000}
+.orange{background:#ff9f0a}
+</style>
+</head>
+<body>
+<div class="calc">
+<div id="display">0</div>
+<div class="keys">
+<button class="gray" onclick="clearAll()">AC</button>
+<button class="gray" onclick="backspace()">⌫</button>
+<button class="gray" onclick="add('%')">%</button>
+<button class="orange" onclick="add('/')">÷</button>
+<button onclick="add('7')">7</button>
+<button onclick="add('8')">8</button>
+<button onclick="add('9')">9</button>
+<button class="orange" onclick="add('*')">×</button>
+<button onclick="add('4')">4</button>
+<button onclick="add('5')">5</button>
+<button onclick="add('6')">6</button>
+<button class="orange" onclick="add('-')">−</button>
+<button onclick="add('1')">1</button>
+<button onclick="add('2')">2</button>
+<button onclick="add('3')">3</button>
+<button class="orange" onclick="add('+')">+</button>
+<button onclick="add('0')">0</button>
+<button onclick="add('.')">,</button>
+<button onclick="add('0')">0</button>
+<button class="orange" onclick="calc()">=</button>
+</div>
+</div>
+<script>
+let e='';
+function add(v){e+=v;document.getElementById('display').innerText=e}
+function clearAll(){e='';document.getElementById('display').innerText='0'}
+function backspace(){e=e.slice(0,-1);document.getElementById('display').innerText=e||'0'}
+function calc(){try{e=eval(e).toString();document.getElementById('display').innerText=e}catch{document.getElementById('display').innerText='Erro'}}
+</script>
+</body>
+</html>
